@@ -1,16 +1,34 @@
 "use server";
 
+import { apiClient } from "@/lib/api";
+import { User } from "@/lib/types";
+
 export async function registerAction(
-    prevState: { success: boolean, error: string } | null,
+    prevState: { success: boolean, error: string, redirectTo?: string } | null,
     formData: FormData
 ) {
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    
-    console.log(name);
-    console.log(email);
-    console.log(password);
+    try {
+        const name = formData.get("name") as string;
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
 
-    return { success: true, error: "" };
+        const data = {
+            name,
+            email,
+            password,
+        }
+        
+        await apiClient<User>("/users", {
+            method: "POST",
+            body:  JSON.stringify(data),
+        });
+
+        return { success: true, error: "", redirectTo: "/login" };
+    } catch (error) {
+        if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+
+        return { success: false, error: "Erro ao criar conta." };
+    }
 }

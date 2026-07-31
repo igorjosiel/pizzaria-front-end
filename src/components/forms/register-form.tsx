@@ -1,15 +1,24 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { registerAction } from "@/actions/auth";
 
 export function RegisterForm() {
     const [state, formAction, isPending] = useActionState(registerAction, null);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        if (state?.success && state?.redirectTo) {
+            router.replace(state.redirectTo);
+        }
+    }, [state, router]);
 
     return (
         <Card className="bg-app-card border border-app-border w-full max-w-md mx-auto">
