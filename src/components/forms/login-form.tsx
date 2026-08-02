@@ -7,10 +7,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { registerAction } from "@/actions/auth";
+import { loginAction } from "@/actions/auth";
 
-export function RegisterForm() {
-    const [state, formAction, isPending] = useActionState(registerAction, null);
+export function LoginForm() {
+    const [state, formAction, isPending] = useActionState(loginAction, null);
 
     const router = useRouter();
 
@@ -30,19 +30,6 @@ export function RegisterForm() {
             
             <CardContent>
                 <form className="space-y-4" action={formAction}>
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="text-white">Nome</Label>
-                        <Input
-                            type="text"
-                            id="name"
-                            name="name"
-                            placeholder="Digite seu nome"
-                            required
-                            minLength={3}
-                            className="text-white bg-app-card border border-app-border"
-                        />
-                    </div>
-
                     <div className="space-y-2">
                         <Label htmlFor="email" className="text-white">E-mail</Label>
                         <Input
@@ -71,13 +58,19 @@ export function RegisterForm() {
                         type="submit"
                         className="w-full bg-brand-primary text-white hover:bg-brand-primary/50 cursor-pointer"
                     >
-                        {isPending ? "Criando conta..." : "Criar conta"}
+                        {isPending ? "Acessando conta..." : "Acessar conta"}
                     </Button>
 
+                    {state?.error && (
+                        <div className="text-sm text-red-500 bg-red-50 p-3 rounded-md">
+                            {state.error}
+                        </div>
+                    )}
+
                     <p className="text-center text-sm text-gray-100">
-                        Já tem uma conta?
-                        <Link href="/login" className="text-brand-primary font-semibold ml-1">
-                            Faça o login
+                        Ainda não possui uma conta?
+                        <Link href="/register" className="text-brand-primary font-semibold ml-1">
+                            Crie uma conta
                         </Link>
                     </p>
                 </form>
