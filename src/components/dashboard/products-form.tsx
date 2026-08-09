@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -33,7 +32,6 @@ interface ProductFormProps {
 
 export function ProductForm({ categories }: ProductFormProps) {
   const router = useRouter();
-
   const [open, setOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,12 +39,42 @@ export function ProductForm({ categories }: ProductFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  function convertBRLToCents(value: string): number {
+    const cleanValue = value
+      .replace(/[R$\s]/g, "")
+      .replace(/\./g, "")
+      .replace(",", ".");
+
+    const reais = parseFloat(cleanValue) || 0;
+
+    return Math.round(reais * 100);
+  }
+
   async function handleCreateProduct(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    if (!imageFile) {
+      setIsLoading(false);
+      return;
+    }
+
+    const formData = new FormData();
+
+    const formElement = e.currentTarget;
+
+    const name = (formElement.elements.namedItem("name") as HTMLInputElement)
+      ?.value;
+    const description = (
+      formElement.elements.namedItem("description") as HTMLInputElement
+    )?.value;
+    const priceInCents = convertBRLToCents(priceValue);
+
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", priceInCents.toString());
     formData.append("category_id", selectedCategory);
+    formData.append("file", imageFile);
 
     const result = await createProductAction(formData);
 
@@ -55,9 +83,7 @@ export function ProductForm({ categories }: ProductFormProps) {
     if (result.success) {
       setOpen(false);
       setSelectedCategory("");
-
       router.refresh();
-
       return;
     } else {
       console.log(result.error);
@@ -82,7 +108,6 @@ export function ProductForm({ categories }: ProductFormProps) {
 
   function handlePriceChange(e: React.ChangeEvent<HTMLInputElement>) {
     const formatted = formatToBrl(e.target.value);
-
     setPriceValue(formatted);
   }
 
@@ -95,9 +120,7 @@ export function ProductForm({ categories }: ProductFormProps) {
       }
 
       setImageFile(file);
-
       const reader = new FileReader();
-
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
@@ -198,7 +221,6 @@ export function ProductForm({ categories }: ProductFormProps) {
             <Label htmlFor="file" className="mb-2">
               Imagem do produto
             </Label>
-            
             {imagePreview ? (
               <div className="relative w-full h-48 border rounded-lg overflow-hidden">
                 <Image
