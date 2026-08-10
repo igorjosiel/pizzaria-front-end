@@ -3,8 +3,9 @@ import { apiClient } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { Category, Product } from "@/lib/types";
 import { Package } from "lucide-react";
-import { ProductForm } from "@/components/dashboard/product-form";
+import { ProductForm } from "@/components/dashboard/products-form";
 import Image from "next/image";
+import { DeleteButtonProduct } from "@/components/dashboard/delete-button";
 
 export default async function Products() {
   const token = await getToken();
@@ -58,8 +59,12 @@ export default async function Products() {
               </div>
               <CardHeader>
                 <CardTitle className="gap-2 flex items-center text-base md:text-lg">
-                  <Package className="w-5 h-5" />
-                  <span>{product.name}</span>
+                  <div className="flex flex-row gap-2 items-center">
+                    <Package className="w-5 h-5" />
+                    <span>{product.name}</span>
+                  </div>
+
+                  <DeleteButtonProduct productId={product.id} />
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
